@@ -285,11 +285,29 @@ if(P.get('charavideo')){
     if(v.readyState>=2&&cv.width>0){
       ctx.drawImage(v,sx,0,sw,v.videoHeight,0,0,cv.width,cv.height);
       const f=ctx.getImageData(0,0,cv.width,cv.height),d=f.data;
-      for(let i=0;i<d.length;i+=4){
-        const dr=d[i]-kr,dg=d[i+1]-kg,db=d[i+2]-kb;
-        const dist=Math.sqrt(dr*dr+dg*dg+db*db);
-        if(dist<tol){d[i+3]=0;}
-        else if(dist<tol*1.35){d[i+3]=(dist-tol)/(tol*.35)*255;}
+      /* 優勢度方式: キー色の最強チャンネルが他よりどれだけ強いかで判定 */
+      let dc=1;
+      if(kr>=kg&&kr>=kb)dc=0; else if(kb>=kr&&kb>=kg)dc=2;
+      const o1=(dc+1)%3,o2=(dc+2)%3,karr=[kr,kg,kb];
+      const keyDom=karr[dc]-Math.max(karr[o1],karr[o2]);
+      if(keyDom>10){
+        const tHigh=keyDom*.55*(110/Math.max(tol,20));
+        const tLow=tHigh*.55;
+        for(let i=0;i<d.length;i+=4){
+          const pd=d[i+dc],pm=Math.max(d[i+o1],d[i+o2]);
+          const dom=pd-pm;
+          if(dom>=tHigh){d[i+3]=0;}
+          else if(dom>tLow){d[i+3]=255*(1-(dom-tLow)/(tHigh-tLow));d[i+dc]=pm;}
+          else if(dom>0){d[i+dc]=pm;} /* 縁の色かぶりを自動補正 */
+        }
+      }else{
+        /* キー色に優勢チャンネルがない場合は旧・色距離方式 */
+        for(let i=0;i<d.length;i+=4){
+          const dr=d[i]-kr,dg=d[i+1]-kg,db=d[i+2]-kb;
+          const dist=Math.sqrt(dr*dr+dg*dg+db*db);
+          if(dist<tol){d[i+3]=0;}
+          else if(dist<tol*1.35){d[i+3]=(dist-tol)/(tol*.35)*255;}
+        }
       }
       ctx.putImageData(f,0,0);
     }
