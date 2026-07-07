@@ -81,11 +81,13 @@
     border:1px solid rgba(216,181,106,.65);}
   /* ===== 右側アクション ===== */
   #actions{position:absolute;right:8px;bottom:86px;z-index:10;
-    display:flex;flex-direction:column;gap:16px;align-items:center;}
+    display:flex;flex-direction:column;gap:24px;align-items:center;}
   .act{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.42);
     display:flex;align-items:center;justify-content:center;font-size:21px;
     backdrop-filter:blur(6px);border:none;color:#fff;}
-  .act small{position:absolute;bottom:-15px;color:#fff;font-size:9.5px;text-shadow:0 1px 3px #000;}
+  .act small{position:absolute;bottom:-19px;left:50%;transform:translateX(-50%);
+    white-space:nowrap;color:#fff;font-size:10.5px;font-weight:700;
+    background:rgba(0,0,0,.6);padding:2px 8px;border-radius:999px;backdrop-filter:blur(4px);}
   .actwrap{position:relative;}
   #heartbtn:active{transform:scale(.85);}
   /* ===== いいねカウンター ===== */

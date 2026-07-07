@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>彩月 − ひるのおしゃべりリール</title>
+<style>
+  :root{
+    --deep:#fff3f6;
+    --deep2:#ffe3ec;
+    --gold:#d9a441;
+    --goldsoft:rgba(217,164,65,.6);
+    --text:#5c2540;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;background:#000;overflow:hidden;
+    font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif;}
+  #stage{position:relative;height:100dvh;max-width:calc(100dvh*9/16);
+    margin:0 auto;overflow:hidden;user-select:none;
+    background:
+      radial-gradient(ellipse 120% 60% at 50% -10%, #ffd9e6 0%, transparent 55%),
+      radial-gradient(ellipse 80% 40% at 80% 108%, #ffe9c9 0%, transparent 60%),
+      linear-gradient(180deg, var(--deep) 0%, #ffeaf1 55%, var(--deep2) 100%);}
+  /* 背景画像レイヤー(?bg=指定時のみ) */
+  #bg{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;}
+  #bg.on{opacity:1;animation:bgdrift 30s ease-in-out infinite alternate;}
+  @keyframes bgdrift{from{transform:scale(1.0);}to{transform:scale(1.035);}}
+  #bg.on ~ #veil{position:absolute;inset:0;background:rgba(255,244,248,.45);}
+  /* 星 */
+  .star{position:absolute;z-index:3;color:#f0c46a;pointer-events:none;
+    animation:twinkle 4s ease-in-out infinite;text-shadow:0 0 6px #ffd98a;}
+  @keyframes twinkle{0%,100%{opacity:.1;transform:scale(.8);}50%{opacity:.8;transform:scale(1.1);}}
+  /* ===== スライドカード ===== */
+  #slidecard{position:absolute;top:9%;left:8%;right:8%;z-index:10;text-align:center;
+    color:var(--text);transition:opacity .6s ease, transform .6s ease;}
+  #slidecard.out{opacity:0;transform:translateY(10px);}
+  #ornament{color:var(--gold);font-size:13px;letter-spacing:.6em;margin-bottom:14px;}
+  #stitle{font-size:24px;font-weight:600;letter-spacing:.14em;line-height:1.6;
+    text-shadow:0 1px 10px rgba(255,255,255,.95);}
+  #sdivider{width:52px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    margin:16px auto;}
+  #sbody{font-size:15.5px;line-height:2.15;letter-spacing:.08em;white-space:pre-line;
+    text-shadow:0 1px 8px rgba(255,255,255,.95);}
+  /* 進行ドット */
+  #dots{position:absolute;top:6%;left:0;right:0;z-index:10;display:flex;gap:7px;justify-content:center;}
+  #dots i{width:5px;height:5px;border-radius:50%;background:rgba(217,164,65,.32);transition:.4s;}
+  #dots i.on{background:var(--gold);box-shadow:0 0 6px var(--goldsoft);}
+  /* ===== キャラレイヤー ===== */
+  #chara{position:absolute;left:50%;bottom:0;z-index:5;width:100%;
+    max-height:var(--ch,50%);object-fit:contain;object-position:bottom;display:none;
+    transform:translateX(-50%);transform-origin:bottom center;
+    filter:drop-shadow(0 -4px 30px rgba(224,120,160,.4));}
+  #chara.on{display:block;animation:charabreathe 4s ease-in-out infinite;}
+  @keyframes charabreathe{
+    0%,100%{transform:translateX(-50%) translateY(0) scale(1);}
+    50%{transform:translateX(-50%) translateY(-11px) scale(1.012);}
+  }
+  #characanvas{position:absolute;left:50%;bottom:0;z-index:5;width:100%;
+    max-height:var(--ch,50%);object-fit:contain;object-position:bottom;display:none;
+    transform:translateX(-50%);}
+  #characanvas.onv{display:block;}
+  /* ===== 署名 ===== */
+  #sig{position:absolute;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:11;
+    display:flex;align-items:center;gap:8px;}
+  #sig img{width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);}
+  #signame{color:var(--text);font-size:13px;letter-spacing:.12em;}
+  #signame small{display:block;color:var(--goldsoft);font-size:9px;letter-spacing:.2em;margin-top:2px;}
+  /* ===== 動画再生タップ促し ===== */
+  #tapstart{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.55);color:#fff;font-size:15px;font-weight:700;font-family:sans-serif;}
+  #tapstart.show{display:flex;}
+  /* ===== クロマキー調整デバッグ ===== */
+  #kdebug{position:absolute;top:130px;right:8px;z-index:40;background:rgba(0,0,0,.78);color:#7dff7d;
+    font-size:11px;font-family:monospace;padding:8px 10px;border-radius:10px;max-width:190px;}
+  #kdebug button{margin:5px 5px 0 0;font-size:11px;padding:5px 10px;border:none;border-radius:6px;}
+  #kdhint{color:#fff;margin-top:5px;font-size:10px;line-height:1.4;}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <div id="veil"></div>
+  <div id="dots"></div>
+  <div id="slidecard">
+    <div id="ornament">✦ ─── ☀ ─── ✦</div>
+    <div id="stitle"></div>
+    <div id="sdivider"></div>
+    <div id="sbody"></div>
+  </div>
+  <img id="chara" alt="">
+  <canvas id="characanvas"></canvas>
+  <div id="sig">
+    <img src="data:image/jpeg;base64,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" alt="">
+    <div id="signame">彩月<small>SATSUKI|ひるのおしゃべり</small></div>
+  </div>
+  <div id="tapstart">タップしてスタート ▶</div>
+</div>
+
+<script>
+const stage=document.getElementById('stage');
+const P=new URLSearchParams(location.search);
+
+/* ---- 星 ---- */
+for(let i=0;i<18;i++){
+  const s=document.createElement('span');
+  s.className='star';s.textContent=Math.random()<.35?'✦':'･';
+  s.style.left=(Math.random()*94+2)+'%';
+  s.style.top=(Math.random()*70+2)+'%';
+  s.style.fontSize=(Math.random()*7+5)+'px';
+  s.style.animationDelay=(Math.random()*4)+'s';
+  stage.appendChild(s);
+}
+
+/* ---- スライド ---- */
+let slides=[
+  {t:"きょうのハッピー占い", b:"朝いちばんに窓をあけて、\n光をたっぷり浴びてみて。\nそれだけで運気は上向きだよ⭐"},
+  {t:"カフェ気分の開運アクション", b:"お気に入りのカップで\nあったかい飲みものをひとくち。\nほっとした瞬間に、いい報せは来るの。"},
+  {t:"今週のラッキーカラー", b:"ペールゴールド✨\n小物にひとつ足すだけで、\n笑顔の出会いを引き寄せるよ。"}
+];
+const dur=(parseFloat(P.get('dur'))||6)*1000;
+let idx=0,timer=null;
+const card=document.getElementById('slidecard');
+const dots=document.getElementById('dots');
+
+function renderDots(){
+  dots.innerHTML=slides.map((_,i)=>'<i'+(i===idx?' class="on"':'')+'></i>').join('');
+}
+function show(i,instant){
+  idx=(i+slides.length)%slides.length;
+  const apply=()=>{
+    document.getElementById('stitle').textContent=slides[idx].t;
+    document.getElementById('sbody').textContent=slides[idx].b;
+    renderDots();
+    card.classList.remove('out');
+  };
+  if(instant){apply();return;}
+  card.classList.add('out');
+  setTimeout(apply,600);
+}
+function startTimer(){clearInterval(timer);timer=setInterval(()=>show(idx+1),dur);}
+
+/* スライド定義ファイル(?slides=xxx.txt)。「---」の行で区切り、各ブロック1行目=タイトル */
+function parseSlides(text){
+  const blocks=text.replace(/\r/g,'').split(/\n\s*---\s*\n/).map(b=>b.trim()).filter(Boolean);
+  const arr=blocks.map(b=>{
+    const lines=b.split('\n');
+    return {t:lines[0].trim(), b:lines.slice(1).join('\n').trim()};
+  }).filter(s=>s.t);
+  return arr.length?arr:null;
+}
+if(P.get('slides')){
+  fetch(P.get('slides')).then(r=>r.text()).then(t=>{
+    const arr=parseSlides(t);
+    if(arr){slides=arr;show(0,true);startTimer();}
+  }).catch(()=>{});
+}
+show(0,true);startTimer();
+/* カードタップで手動送り */
+card.addEventListener('click',()=>{show(idx+1);startTimer();});
+
+/* ---- 背景画像(?bg=) ---- */
+const bgEl=document.getElementById('bg');
+if(P.get('bg')){bgEl.style.backgroundImage='url("'+P.get('bg')+'")';bgEl.classList.add('on');}
+
+/* ---- キャラの高さ(?ch=0.2〜0.9、デフォルト0.5) ---- */
+const ch=Math.min(.9,Math.max(.2,parseFloat(P.get('ch')||'0.5')));
+stage.style.setProperty('--ch',(ch*100)+'%');
+
+/* ---- キャラ静止画(?chara=) ---- */
+if(P.get('chara')){
+  const c=document.getElementById('chara');
+  c.src=P.get('chara');c.classList.add('on');
+}
+
+/* ---- キャラ動画+クロマキー(?charavideo=&key=&tol=&vw=) ---- */
+if(P.get('charavideo')){
+  const v=document.createElement('video');
+  v.src=P.get('charavideo');
+  v.muted=true;v.loop=true;v.playsInline=true;v.setAttribute('playsinline','');v.crossOrigin='anonymous';
+  const cv=document.getElementById('characanvas');
+  cv.classList.add('onv');
+  const ctx=cv.getContext('2d',{willReadFrequently:true});
+  const kh=(P.get('key')||'00ff00').replace('#','');
+  let kr=parseInt(kh.substr(0,2),16),kg=parseInt(kh.substr(2,2),16),kb=parseInt(kh.substr(4,2),16);
+  let tol=parseInt(P.get('tol')||'110');
+  const vwf=Math.min(1,Math.max(.2,parseFloat(P.get('vw')||'1')));
+  let sx=0,sw=0;
+  v.addEventListener('loadedmetadata',()=>{
+    sw=v.videoWidth*vwf;sx=(v.videoWidth-sw)/2;
+    cv.width=sw;cv.height=v.videoHeight;
+  });
+  function draw(){
+    if(v.readyState>=2&&cv.width>0){
+      ctx.drawImage(v,sx,0,sw,v.videoHeight,0,0,cv.width,cv.height);
+      const f=ctx.getImageData(0,0,cv.width,cv.height),d=f.data;
+      let dc=1;
+      if(kr>=kg&&kr>=kb)dc=0; else if(kb>=kr&&kb>=kg)dc=2;
+      const o1=(dc+1)%3,o2=(dc+2)%3,karr=[kr,kg,kb];
+      const keyDom=karr[dc]-Math.max(karr[o1],karr[o2]);
+      if(keyDom>10){
+        const tHigh=keyDom*.55*(110/Math.max(tol,20));
+        const tLow=tHigh*.55;
+        for(let i=0;i<d.length;i+=4){
+          const pd=d[i+dc],pm=Math.max(d[i+o1],d[i+o2]);
+          const dom=pd-pm;
+          if(dom>=tHigh){d[i+3]=0;}
+          else if(dom>tLow){d[i+3]=255*(1-(dom-tLow)/(tHigh-tLow));d[i+dc]=pm;}
+          else if(dom>0){d[i+dc]=pm;}
+        }
+      }else{
+        for(let i=0;i<d.length;i+=4){
+          const dr=d[i]-kr,dg=d[i+1]-kg,db=d[i+2]-kb;
+          const dist=Math.sqrt(dr*dr+dg*dg+db*db);
+          if(dist<tol){d[i+3]=0;}
+          else if(dist<tol*1.35){d[i+3]=(dist-tol)/(tol*.35)*255;}
+        }
+      }
+      ctx.putImageData(f,0,0);
+    }
+    requestAnimationFrame(draw);
+  }
+  /* デバッグ(?debug=1) */
+  if(P.get('debug')){
+    const dbg=document.createElement('div');dbg.id='kdebug';
+    dbg.innerHTML='<span id="kdinfo"></span><br><button id="kdm">tol−15</button><button id="kdp">tol+15</button>'+
+      '<div id="kdhint">キャラ以外の残った背景色をタップ→その色がkeyになる。決まったらURLに key=/tol= を書き写す</div>';
+    stage.appendChild(dbg);
+    const info=()=>{document.getElementById('kdinfo').textContent=
+      'key='+[kr,kg,kb].map(x=>x.toString(16).padStart(2,'0')).join('')+' tol='+tol;};
+    info();
+    document.getElementById('kdm').onclick=()=>{tol=Math.max(20,tol-15);info();};
+    document.getElementById('kdp').onclick=()=>{tol+=15;info();};
+    cv.addEventListener('click',e=>{
+      const r=cv.getBoundingClientRect();
+      const scale=Math.min(r.width/cv.width,r.height/cv.height);
+      const ox=(r.width-cv.width*scale)/2,oy=(r.height-cv.height*scale);
+      const x=Math.floor((e.clientX-r.left-ox)/scale),y=Math.floor((e.clientY-r.top-oy)/scale);
+      if(x<0||y<0||x>=cv.width||y>=cv.height)return;
+      const t=document.createElement('canvas');t.width=cv.width;t.height=cv.height;
+      const tc=t.getContext('2d');
+      tc.drawImage(v,sx,0,sw,v.videoHeight,0,0,cv.width,cv.height);
+      const px=tc.getImageData(x,y,1,1).data;
+      kr=px[0];kg=px[1];kb=px[2];info();
+    });
+  }
+  const ts=document.getElementById('tapstart');
+  v.play().catch(()=>{
+    ts.classList.add('show');
+    ts.addEventListener('click',()=>{v.play();ts.classList.remove('show');},{once:true});
+  });
+  draw();
+}
+</script>
+</body>
+</html>
