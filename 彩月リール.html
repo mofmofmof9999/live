@@ -35,11 +35,11 @@
     color:var(--text);transition:opacity .6s ease, transform .6s ease;}
   #slidecard.out{opacity:0;transform:translateY(10px);}
   #ornament{color:var(--gold);font-size:13px;letter-spacing:.6em;margin-bottom:14px;}
-  #stitle{font-size:24px;font-weight:600;letter-spacing:.14em;line-height:1.6;
+  #stitle{font-size:clamp(17px,6vw,24px);font-weight:600;letter-spacing:.14em;line-height:1.6;text-wrap:balance;
     text-shadow:0 1px 10px rgba(255,255,255,.95);}
   #sdivider{width:52px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);
     margin:16px auto;}
-  #sbody{font-size:15.5px;line-height:2.15;letter-spacing:.08em;white-space:pre-line;
+  #sbody{text-wrap:balance;font-size:clamp(13px,4.1vw,15.5px);line-height:2.15;letter-spacing:.08em;white-space:pre-line;
     text-shadow:0 1px 8px rgba(255,255,255,.95);}
   /* 進行ドット */
   #dots{position:absolute;top:6%;left:0;right:0;z-index:10;display:flex;gap:7px;justify-content:center;}
@@ -61,7 +61,9 @@
   #characanvas.onv{display:block;}
   /* ===== 署名 ===== */
   #sig{position:absolute;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:11;
-    display:flex;align-items:center;gap:8px;}
+    display:flex;align-items:center;gap:8px;
+    background:rgba(255,246,250,.78);border:1px solid rgba(217,164,65,.55);
+    border-radius:999px;padding:5px 14px 5px 6px;backdrop-filter:blur(8px);}
   #sig img{width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);}
   #signame{color:var(--text);font-size:13px;letter-spacing:.12em;}
   #signame small{display:block;color:var(--goldsoft);font-size:9px;letter-spacing:.2em;margin-top:2px;}
@@ -213,6 +215,18 @@ if(P.get('charavideo')){
           const dist=Math.sqrt(dr*dr+dg*dg+db*db);
           if(dist<tol){d[i+3]=0;}
           else if(dist<tol*1.35){d[i+3]=(dist-tol)/(tol*.35)*255;}
+        }
+      }
+      /* 左右カット断面のフェード(切れ目を霧のように溶かす) */
+      {
+        const w=cv.width,hgt=cv.height,edge=Math.max(2,Math.round(w*.05));
+        for(let y=0;y<hgt;y++){
+          const row=y*w*4;
+          for(let x=0;x<edge;x++){
+            const fx=x/edge;
+            d[row+x*4+3]*=fx;
+            d[row+(w-1-x)*4+3]*=fx;
+          }
         }
       }
       ctx.putImageData(f,0,0);
