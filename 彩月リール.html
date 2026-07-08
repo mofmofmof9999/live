@@ -60,13 +60,13 @@
     transform:translateX(-50%);}
   #characanvas.onv{display:block;}
   /* ===== 署名 ===== */
-  #sig{position:absolute;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:11;
+  #sig{position:absolute;right:12px;top:12px;z-index:11;
     display:flex;align-items:center;gap:8px;
     background:rgba(255,246,250,.78);border:1px solid rgba(217,164,65,.55);
     border-radius:999px;padding:5px 14px 5px 6px;backdrop-filter:blur(8px);}
-  #sig img{width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);}
-  #signame{color:var(--text);font-size:13px;letter-spacing:.12em;}
-  #signame small{display:block;color:var(--goldsoft);font-size:9px;letter-spacing:.2em;margin-top:2px;}
+  #sig img{width:24px;height:24px;border-radius:50%;border:1px solid var(--gold);}
+  #signame{color:var(--text);font-size:11.5px;letter-spacing:.12em;}
+  #signame small{display:block;color:var(--goldsoft);font-size:8px;letter-spacing:.15em;margin-top:1px;}
   /* ===== 動画再生タップ促し ===== */
   #tapstart{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
     background:rgba(0,0,0,.55);color:#fff;font-size:15px;font-weight:700;font-family:sans-serif;}
@@ -163,6 +163,9 @@ card.addEventListener('click',()=>{show(idx+1);startTimer();});
 /* ---- 背景画像(?bg=) ---- */
 const bgEl=document.getElementById('bg');
 if(P.get('bg')){bgEl.style.backgroundImage='url("'+P.get('bg')+'")';bgEl.classList.add('on');}
+
+/* ---- 署名の非表示(?sig=0) ---- */
+if(P.get('sig')==='0'){document.getElementById('sig').style.display='none';}
 
 /* ---- キャラの高さ(?ch=0.2〜0.9、デフォルト0.5) ---- */
 const ch=Math.min(.9,Math.max(.2,parseFloat(P.get('ch')||'0.5')));
