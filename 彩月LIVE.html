@@ -254,7 +254,15 @@ fb.addEventListener('click',()=>{fb.textContent='フォロー中';fb.classList.a
 
 /* ---- レイヤー分離モード(?bg=xxx.jpg&chara=xxx.png) ---- */
 const P=new URLSearchParams(location.search);
+if(P.get('ui')==='0'){document.getElementById('actions').style.display='none';}
+if(P.get('input')==='0'){document.getElementById('bottombar').style.display='none';}
 const bgEl=document.getElementById('bg');
+
+/* ---- UIの部分非表示(YouTube等の自前UIと被る場合) ---- */
+/* ?ui=0 で右側アクション(ハート/ギフト/シェア)を非表示 */
+if(P.get('ui')==='0'){document.getElementById('actions').style.display='none';}
+/* ?input=0 で下部のコメント入力バーを非表示 */
+if(P.get('input')==='0'){document.getElementById('bottombar').style.display='none';}
 if(P.get('bg')){bgEl.style.backgroundImage='url("'+P.get('bg')+'")';}
 if(P.get('chara')){
   const c=document.getElementById('chara');

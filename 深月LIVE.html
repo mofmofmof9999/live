@@ -258,6 +258,8 @@ fb.addEventListener('click',()=>{fb.textContent='フォロー中';fb.classList.a
 
 /* ---- レイヤー分離モード(?bg=xxx.jpg&chara=xxx.png) ---- */
 const P=new URLSearchParams(location.search);
+if(P.get('ui')==='0'){document.getElementById('actions').style.display='none';}
+if(P.get('input')==='0'){document.getElementById('bottombar').style.display='none';}
 const bgEl=document.getElementById('bg');
 if(P.get('bg')){bgEl.style.backgroundImage='url("'+P.get('bg')+'")';}
 if(P.get('chara')){
