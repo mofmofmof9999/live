@@ -25,7 +25,7 @@
   #bg{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;}
   #bg.on{opacity:1;animation:bgdrift 30s ease-in-out infinite alternate;}
   @keyframes bgdrift{from{transform:scale(1.0);}to{transform:scale(1.035);}}
-  #bg.on ~ #veil{position:absolute;inset:0;background:rgba(16,10,35,.35);}
+  #bg.on ~ #veil{position:absolute;inset:0;background:rgba(16,10,35,var(--veilop,.35));}
   /* 星 */
   .star{position:absolute;z-index:3;color:#e8dcff;pointer-events:none;
     animation:twinkle 4s ease-in-out infinite;text-shadow:0 0 6px #cbb6ff;}
@@ -175,6 +175,10 @@ stage.style.setProperty('--ch',(ch*100)+'%');
 /* ---- キャラの水平位置(?cx=-45〜45、%指定、デフォルト0=中央。負で左、正で右) ---- */
 const cx=Math.min(45,Math.max(-45,parseFloat(P.get('cx')||'0')));
 stage.style.setProperty('--cx',cx+'%');
+
+/* ---- ベールの濃さ(?veil=0〜1、デフォルト0.35。0で完全に元画像の色味、1で最も暗く) ---- */
+const veil=Math.min(1,Math.max(0,parseFloat(P.get('veil')||'0.35')));
+stage.style.setProperty('--veilop',veil);
 
 /* ---- キャラ静止画(?chara=) ---- */
 if(P.get('chara')){
