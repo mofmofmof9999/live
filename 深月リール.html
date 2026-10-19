@@ -31,10 +31,13 @@
     animation:twinkle 4s ease-in-out infinite;text-shadow:0 0 6px #cbb6ff;}
   @keyframes twinkle{0%,100%{opacity:.1;transform:scale(.8);}50%{opacity:.8;transform:scale(1.1);}}
   /* ===== スライドカード ===== */
-  #slidecard{position:absolute;top:9%;left:calc(8% - 16px);right:calc(8% - 16px);z-index:10;text-align:center;
-    padding:20px 16px;margin-top:-20px;will-change:opacity,transform;-webkit-backface-visibility:hidden;backface-visibility:hidden;
-    color:var(--text);transition:opacity .6s ease, transform .6s ease;}
-  #slidecard.out{opacity:0;transform:translateY(10px);}
+  /* フェードは画面いっぱいの透明ラッパーに掛ける(レイヤーの端=画面の端になり、カード縁の黒い細線が出ない) */
+  #slidewrap{position:absolute;inset:-8px;z-index:10;pointer-events:none;
+    transition:opacity .6s ease, transform .6s ease;}
+  #slidewrap.out{opacity:0;transform:translateY(10px);}
+  #slideinner{position:absolute;inset:8px;}
+  #slidecard{position:absolute;top:9%;left:8%;right:8%;text-align:center;pointer-events:auto;
+    color:var(--text);}
   #ornament{color:var(--gold);font-size:13px;letter-spacing:.6em;margin-bottom:14px;}
   #stitle{font-size:clamp(17px,6vw,24px);font-weight:600;letter-spacing:.14em;line-height:1.6;text-wrap:balance;
     text-shadow:0 2px 12px rgba(20,10,50,.8);}
@@ -85,12 +88,14 @@
   <div id="bg"></div>
   <div id="veil"></div>
   <div id="dots"></div>
+  <div id="slidewrap"><div id="slideinner">
   <div id="slidecard">
     <div id="ornament">✦ ─── ☾ ─── ✦</div>
     <div id="stitle"></div>
     <div id="sdivider"></div>
     <div id="sbody"></div>
   </div>
+  </div></div>
   <img id="chara" alt="">
   <canvas id="characanvas"></canvas>
   <div id="sig">
@@ -124,6 +129,7 @@ let slides=[
 const dur=(parseFloat(P.get('dur'))||6)*1000;
 let idx=0,timer=null;
 const card=document.getElementById('slidecard');
+const wrap=document.getElementById('slidewrap');
 const dots=document.getElementById('dots');
 
 function renderDots(){
@@ -135,10 +141,10 @@ function show(i,instant){
     document.getElementById('stitle').textContent=slides[idx].t;
     document.getElementById('sbody').textContent=slides[idx].b;
     renderDots();
-    card.classList.remove('out');
+    wrap.classList.remove('out');
   };
   if(instant){apply();return;}
-  card.classList.add('out');
+  wrap.classList.add('out');
   setTimeout(apply,600);
 }
 function startTimer(){clearInterval(timer);timer=setInterval(()=>show(idx+1),dur);}
